@@ -1,0 +1,9 @@
+tech stack: react, python, openai 
+
+frontend architecture:
+* there should be a list asking for qualifications of a person
+* and a text box asking for the job's description, and lastly a button that says create!
+* the created pdf should start to download
+
+backend architecture:
+* User's qualifications should be stored in sqlLite, just text
