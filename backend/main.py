@@ -1,7 +1,6 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
-from model import qualification
-from db import add_qualification_to_db, get_qualifications
+from db import add_qualification_to_db, get_qualifications, set_qualification_table
 from llmCVGenerate import askForMatchingQualifications
 
 app = Flask(__name__)
@@ -10,21 +9,36 @@ CORS(app)
 # endpoints: ./getQualifications ./setQualificationListToList ./createCV ./getLastCreatedCV
 
 
-@app.route("/getQualification")
+@app.route("/getQualifications")
 def getQualifications():
     qualifications = get_qualifications()
-    return jsonify(qualification)  # This will break
+    return jsonify(qualifications)
 
 
-@app.route("/setQualificationListToList")
-def setQualifications():
+@app.route("/addQualification", methods=["POST"])  # this won't be used by the frontend
+def addQualifications():
     body = request.get_json()
-    add_qualification_to_db(body["qualifications"], body["essential"])
+    qualification = body["qualifications"]
 
-@app.route("/askForQualifications")
-def askForQualifications():
+    essentiality = body.get("essential", False)
+
+    add_qualification_to_db(qualification, essentiality)
+
+    # is it better to use responseBodies rather than jsonify ? # probs doesn't matter one bit
+    return Response("Qualification added", status=200)
+
+
+@app.route("/setQualificationListToList", methods=["PATCH"])
+def setQualificationListToList():
     body = request.get_json()
-    response = askForMatchingQualifications(get_qualifications(), body["jobDetails"])
+    set_qualification_table(body["qualifications"])
+    return Response("Qualifications set!", status=200)
+
+
+@app.route("/askForSuggestions")
+def askForSuggestions():
+    body = request.get_json()
+    response = askForMatchingQualifications(get_qualifications(include_date_info=False), body["jobDetails"])
     return jsonify({response})
 
 
