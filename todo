@@ -7,3 +7,5 @@ frontend architecture:
 
 backend architecture:
 * User's qualifications should be stored in sqlLite, just text
+* model:    qualification = {essential :boolean, """whether this should be always be in the cv""", text : String }
+* Idk how to create cv pdf files based of a template
