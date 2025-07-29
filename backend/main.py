@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 from db import add_qualification_to_db, get_qualifications, set_qualification_table
-from llmCVGenerate import askForMatchingQualifications
+from llmCVGenerate import askForMatchingQualifications, getResponse
 
 app = Flask(__name__)
 CORS(app)
@@ -38,14 +38,23 @@ def setQualificationListToList():
 @app.route("/askForSuggestions")
 def askForSuggestions():
     body = request.get_json()
-    response = askForMatchingQualifications(get_qualifications(include_date_info=False), body["jobDetails"])
-    return jsonify({response})
+    response = askForMatchingQualifications(
+        get_qualifications(include_date_info=False), body["jobDetails"]
+    )
+    return jsonify({"response": response})
 
 
 # This should get Job Position details paragraph as body Parameter
 @app.route("/createCV")
 def createCV():
     pass
+
+
+@app.route("/testLLM")
+def testLLM():
+    body = request.get_json()
+    response = getResponse(body.get("prompt", "hey gpt how are you doing?"))
+    return jsonify({"response": response})
 
 
 """

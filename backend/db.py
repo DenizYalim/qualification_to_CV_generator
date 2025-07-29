@@ -62,17 +62,7 @@ def set_qualification_table(new_list):
     conn.close()
 
 
-""" returns all qualifications for a specific date or site
-
-Keyword arguments:
-date : DATE
-website : String
-
-Return: String[]
-"""
-
-
-def get_qualifications(include_date_info = True):
+def get_qualifications(include_date_info=True):
     conn, cursor = pre_req()
 
     statement = "SELECT text, essential FROM qualifications"

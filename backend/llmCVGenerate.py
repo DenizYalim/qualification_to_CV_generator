@@ -21,9 +21,11 @@ def getResponse(prompt, context=None):
 
     return response.choices[0].message.content
 
-def askForMatchingQualifications(qualificationsList, jobDetails):
+def askForMatchingQualifications(qualificationsList, jobDetails, qualities_max = 2):
+    
+
     context = "There is a job position that I want to send my CV to, I want you to choose which qualities I should choose to include in my CV. I will give you both qualification of mine and the job position details."
-    prompt = f"I want to apply to this job: {jobDetails}, here is a list with my qualities/past projects etc.: {qualificationsList}, which qualities I shoulda include in my CV for this job application?"
+    prompt = f"I want to apply to this job: {jobDetails}, here is a list with my qualities/past projects etc.: {qualificationsList}, which qualities I should include in my CV for this job application, name {qualities_max} qualities at max?"
 
     response = getResponse(prompt, context=context)
 
