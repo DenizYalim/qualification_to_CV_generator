@@ -6,18 +6,22 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   // Fetch the list from backend on mount
-  useEffect(() => {
-    fetch('/api/get-list')
-      .then(res => res.json())
-      .then((data: string[]) => {
-        setListText(data.join('\n'));
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Error fetching list:', err);
-        setLoading(false);
-      });
-  }, []);
+useEffect(() => {
+  const fetchList = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/getQualifications');
+      const data: string[] = await res.json();
+      setListText(data.join('\n'));
+    } catch (err) {
+      console.error('Fetch error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchList();
+}, []);
+
 
   // Update list text as user types
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -25,23 +29,24 @@ const App: React.FC = () => {
   };
 
   // Send the updated list to the backend
-  const handleSave = () => {
-    const updatedList: string[] = listText
-      .split('\n')
-      .map(item => item.trim())
-      .filter(item => item !== '');
+const handleSave = () => {
+  const updatedList: string[] = listText
+    .split('\n')
+    .map(item => item.trim())
+    .filter(item => item !== '');
 
-    fetch('/api/update-list', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedList),
+  fetch('http://localhost:5000/setQualificationListToList', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ qualifications: updatedList }),
+  })
+    .then(res => {
+      if (res.ok) alert('Qualifications updated!');
+      else throw new Error('Failed to update');
     })
-      .then(res => {
-        if (res.ok) alert('List updated!');
-        else throw new Error('Failed to update');
-      })
-      .catch(err => alert('Error: ' + err.message));
-  };
+    .catch(err => alert('Error: ' + err.message));
+};
+
 
   if (loading) return <div>Loading...</div>;
 
