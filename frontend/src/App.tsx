@@ -1,35 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import type { ChangeEvent } from 'react';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App: React.FC = () => {
+  const [listText, setListText] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
 
+  // Fetch the list from backend on mount
+  useEffect(() => {
+    fetch('/api/get-list')
+      .then(res => res.json())
+      .then((data: string[]) => {
+        setListText(data.join('\n'));
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching list:', err);
+        setLoading(false);
+      });
+  }, []);
+
+  // Update list text as user types
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setListText(e.target.value);
+  };
+
+  // Send the updated list to the backend
+  const handleSave = () => {
+    const updatedList: string[] = listText
+      .split('\n')
+      .map(item => item.trim())
+      .filter(item => item !== '');
+
+    fetch('/api/update-list', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedList),
+    })
+      .then(res => {
+        if (res.ok) alert('List updated!');
+        else throw new Error('Failed to update');
+      })
+      .catch(err => alert('Error: ' + err.message));
+  };
+
+  if (loading) return <div>Loading...</div>;
+
+  console.log("App rendered");
+
+  
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div style={{ padding: '20px' }}>
+      <h2>Editable List</h2>
+      <textarea
+        rows={10}
+        cols={40}
+        value={listText}
+        onChange={handleChange}
+      />
+      <br />
+      <button onClick={handleSave}>Save List</button>
+    </div>
+  );
+};
 
-export default App
+export default App;
