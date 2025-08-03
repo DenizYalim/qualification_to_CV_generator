@@ -62,12 +62,15 @@ def set_qualification_table(new_list):
     conn.close()
 
 
-def get_qualifications(include_date_info=True):
+def get_qualifications(include_date_info=True, justQualifications = False):
     conn, cursor = pre_req()
 
     statement = "SELECT text, essential FROM qualifications"
     if include_date_info:
         statement = "SELECT text, essential, dateAdded FROM qualifications"
+    if justQualifications:
+        statement = "SELECT text FROM qualifications"
+
 
     cursor.execute(
         statement,

@@ -11,7 +11,7 @@ CORS(app)
 
 @app.route("/getQualifications")
 def getQualifications():
-    qualifications = get_qualifications()
+    qualifications = get_qualifications(justQualifications=True)
     return jsonify(qualifications)
 
 
