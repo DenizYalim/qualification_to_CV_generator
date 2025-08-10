@@ -41,3 +41,5 @@ def convert_to_pdf(doc_path, pdf_path):
 
 if __name__ == "__main__":
     print("hey")
+    tost = "slm tostum"
+    print(f"{tost}, {{tost}}")
