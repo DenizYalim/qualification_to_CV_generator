@@ -1,5 +1,6 @@
 from docx import Document  # doc manipulator
 from docx2pdf import convert  # doc to pdf
+import json
 
 TEMPLATES_FOLDER = "../CV_templates"
 OUTPUT_FOLDER = "../CVs_generated"
@@ -24,22 +25,29 @@ def fill_line(line, keyword, text):
 
 def fill_cv(template_file_name, values):
     template_file = TEMPLATES_FOLDER + "/" + template_file_name
-    doc = Document(template_file_name)  # This is probably destructive
+    print(template_file)
+    doc = Document(template_file)  # This is probably destructive
 
     for paragraph in doc.paragraphs:
         for key, value in values.items():
-            if f"{{key}}" in paragraph.text:
+            if "{{" + key + "}}" in paragraph.text:
                 inline = paragraph.runs
                 for i in range(len(inline)):
                     if f"{{key}}" in inline[i].text:
                         inline[i].replace(f"{{key}}", value)
         doc.save(OUTPUT_FOLDER)
+        print("saved doc!" +    OUTPUT_FOLDER)
 
 
 def convert_to_pdf(doc_path, pdf_path):
     convert(doc_path, pdf_path)
 
+
 if __name__ == "__main__":
     print("hey")
-    tost = "slm tostum"
-    print(f"{tost}, {{tost}}")
+
+    with open("../example_values.json","r") as f:
+        values = f.read()
+        values = json.dump(values)
+
+    fill_cv("/cv_gen_template_test.docx", values)
