@@ -1,4 +1,5 @@
 from docx import Document
+from docx2pdf import convert
 from pathlib import Path
 import json
 
@@ -57,8 +58,13 @@ def fill_cv(template_file_name: str, values: dict) -> Path:
     doc.save(out_docx)
     return out_docx
 
+def convertDocToPdf(docPath, pdfPath):
+    convert(docPath, pdfPath)
+
 if __name__ == "__main__":
     with open("../example_values.json", "r", encoding="utf-8") as f:
         values = json.load(f)
     out = fill_cv("cv_gen_template_test.docx", values)
     print(out)
+    pdf = convertDocToPdf(out,"/CVs_generated/a.pdf")
+    print(pdf)

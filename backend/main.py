@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 from db import add_qualification_to_db, get_qualifications, set_qualification_table
 from llmCVGenerate import askForMatchingQualifications, getResponse
+from cvMaker import fill_cv, convertDocToPdf
 
 app = Flask(__name__)
 CORS(app)
@@ -35,6 +36,7 @@ def setQualificationListToList():
     return Response("Qualifications set!", status=200)
 
 
+# This should get Job Position details paragraph as body Parameter
 @app.route("/askForSuggestions")
 def askForSuggestions():
     body = request.get_json()
@@ -44,10 +46,25 @@ def askForSuggestions():
     return jsonify({"response": response})
 
 
-# This should get Job Position details paragraph as body Parameter
+# Should get qualities chosen and template chosen from body
+@app.route("/createCVDoc")
+def createCVDoc():
+    body = request.get_json()
+    values = body["values"]
+    template = body["templateName"]
+    doc = fill_cv(template_file_name=template, values=values)
+    return jsonify(f"CV created to {doc}", 200)
+
+
+# Should get qualities chosen and template chosen from body
 @app.route("/createCV")
 def createCV():
-    pass
+    body = request.get_json()
+    values = body["values"]
+    template = body["templateName"]
+    doc = fill_cv(template_file_name=template, values=values)
+    pdf = convertDocToPdf(doc, doc)  # probably not ok
+    return jsonify(f"CV pdf created to {pdf}", 200)
 
 
 @app.route("/testLLM")
