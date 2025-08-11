@@ -53,5 +53,5 @@ if __name__ == "__main__":
     with open("../example_values.json", "r", encoding="utf-8") as f:
         values = json.load(f)
 
-    out_docx = fill_cv("simpler_template.docx", values)
+    out_docx = fill_cv("cv_gen_template_test.docx", values)
     # pdf_path = convert_to_pdf(out_docx)
