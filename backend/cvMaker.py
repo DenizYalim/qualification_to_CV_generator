@@ -7,24 +7,26 @@ TEMPLATES_FOLDER = Path("../CV_templates")
 OUTPUT_FOLDER = Path("../CVs_generated")
 OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
 
-def _replace_in_paragraph(paragraph, mapping):
-    if not mapping or "{{" not in paragraph.text:
-        return
-    for key, val in mapping.items():
-        ph = f"{{{{{key}}}}}"  # e.g. {{full_name}}
-        if ph in paragraph.text:
-            for run in paragraph.runs:
-                run.text = run.text.replace(ph, str(val))
-                print(f"trying replacement {run.text}, {val}")
+
+def _find_and_put(doc, keyword, value):
+    for paragraphs in doc.paragraphs:
+        for p in paragraphs:
+            phrase = "{{" + keyword + "}}"
+            print(phrase)
+            if phrase in p.text:
+                for run in p.runs:
+                    run.text = run.text.replace(phrase, value)
+                    print(f"Trying fo replace to {value}")
+
 
 def _replace_in_doc(doc: Document, mapping: dict):
-    for p in doc.paragraphs:
-        _replace_in_paragraph(p, mapping)
-    for tbl in doc.tables:
-        for row in tbl.rows:
-            for cell in row.cells:
-                for p in cell.paragraphs:
-                    _replace_in_paragraph(p, mapping)
+    for keyword, value in mapping.items():
+        if isinstance(value, list):
+            for val in value:
+                _find_and_put(doc, keyword, val)
+        else:
+            _find_and_put(doc, keyword, value)
+
 
 def fill_cv(template_file_name: str, values: dict) -> Path:
     template_path = TEMPLATES_FOLDER / template_file_name
@@ -36,10 +38,12 @@ def fill_cv(template_file_name: str, values: dict) -> Path:
     doc.save(out_docx)
     return out_docx
 
+
 def convert_to_pdf(doc_path: Path) -> Path:
     pdf_path = doc_path.with_suffix(".pdf")
     convert(str(doc_path), str(pdf_path))  # Requires Word on Windows
     return pdf_path
+
 
 if __name__ == "__main__":
     with open("../example_values.json", "r", encoding="utf-8") as f:
