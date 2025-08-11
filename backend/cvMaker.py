@@ -9,14 +9,18 @@ OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
 
 
 def _find_and_put(doc, keyword, value):
-    for paragraphs in doc.paragraphs:
-        for p in paragraphs:
-            phrase = "{{" + keyword + "}}"
+    placed = False
+    for p in doc.paragraphs:
+        phrase = "{{" + keyword + "}}" 
+        if phrase in p.text:
             print(phrase)
-            if phrase in p.text:
-                for run in p.runs:
-                    run.text = run.text.replace(phrase, value)
-                    print(f"Trying fo replace to {value}")
+            for run in p.runs:
+                run.text = run.text.replace(phrase, value)
+                print(f"Trying fo replace to {value}")
+                placed = True
+                break
+        if placed:
+            break
 
 
 def _replace_in_doc(doc: Document, mapping: dict):
