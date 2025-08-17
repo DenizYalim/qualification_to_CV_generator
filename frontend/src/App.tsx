@@ -55,7 +55,7 @@ const App: React.FC = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h2>Editable List</h2>
+      <h2>Qualifications to be chosen from</h2>
       <textarea
         rows={30}
         cols={150}

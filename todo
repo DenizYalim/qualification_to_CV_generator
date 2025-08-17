@@ -13,6 +13,8 @@ backend architecture:
 
 
 
+
 functions:
 * make gpt create good header descriptions
 * allow qualities that should be displayed always, essentials
+* allow portrait support

@@ -11,8 +11,7 @@ def pre_req():
         """
         CREATE TABLE IF NOT EXISTS qualifications (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            text TEXT NOT NULL,
-            essential BOOLEAN,
+            text TEXT NOT NULL, 
             dateAdded DATE NOT NULL
         )
         """
@@ -22,7 +21,7 @@ def pre_req():
     return conn, cursor
 
 
-def add_qualification_to_db(qualifications, essentiality=False): 
+def add_qualification_to_db(qualifications): 
     conn, cursor = pre_req()
 
     if not isinstance(qualifications, list):
@@ -31,10 +30,10 @@ def add_qualification_to_db(qualifications, essentiality=False):
     for qualification in qualifications:
         cursor.execute(
             """
-            INSERT INTO qualifications (text, essential, dateAdded)
+            INSERT INTO qualifications (text, dateAdded)
             VALUES (?, ?, ?)
             """,
-            (qualification, essentiality, datetime.now().strftime("%Y-%m-%d")),
+            (qualification, datetime.now().strftime("%Y-%m-%d")),
         )
 
     conn.commit()
@@ -58,17 +57,16 @@ def delete_rows():
 def set_qualification_table(new_list):
 
     delete_rows()
-
-    # This is nice and all but this makes it impossible to add essential qualities.
+    
     add_qualification_to_db(new_list)
 
 
 def get_qualifications(include_date_info=True, justQualifications=False):
     conn, cursor = pre_req()
 
-    statement = "SELECT text, essential FROM qualifications"
+    statement = "SELECT text FROM qualifications"
     if include_date_info:
-        statement = "SELECT text, essential, dateAdded FROM qualifications"
+        statement = "SELECT text, dateAdded FROM qualifications"
     if justQualifications:
         statement = "SELECT text FROM qualifications"
 
@@ -85,7 +83,14 @@ def get_qualifications(include_date_info=True, justQualifications=False):
 
     return qualifications
 
+def doQuery(query : str):
+    conn, cursor = pre_req()
+    cursor.execute(query)
+    print(f"done query: {query}")
+    conn.commit()
+    conn.close()
 
-if __name__ == "__main__":
-    print("a")
-    pre_req()
+
+
+if __name__ == "__main__": 
+    doQuery("DROP TABLE qualifications")
