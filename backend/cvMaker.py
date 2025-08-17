@@ -7,6 +7,7 @@ TEMPLATES_FOLDER = Path("../CV_templates")
 OUTPUT_FOLDER = Path("../CVs_generated")
 OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
 
+
 def _replace_one_placeholder_in_paragraph(p, key: str, val: str) -> bool:
     ph = f"{{{{{key}}}}}"
     if ph not in p.text:
@@ -18,6 +19,7 @@ def _replace_one_placeholder_in_paragraph(p, key: str, val: str) -> bool:
         p.text = new_txt  # note: resets runs formatting in this paragraph
         return True
     return False
+
 
 def _place_value(doc: Document, key: str, val: str) -> bool:
     # paragraphs
@@ -39,6 +41,7 @@ def _place_value(doc: Document, key: str, val: str) -> bool:
                     return True
     return False
 
+
 def _replace_in_doc(doc: Document, mapping: dict):
     for k, v in mapping.items():
         key = str(k)
@@ -50,6 +53,7 @@ def _replace_in_doc(doc: Document, mapping: dict):
             while _place_value(doc, key, str(v)):
                 pass
 
+
 def fill_cv(template_file_name: str, values: dict) -> Path:
     tpl = TEMPLATES_FOLDER / template_file_name
     doc = Document(tpl)
@@ -58,13 +62,30 @@ def fill_cv(template_file_name: str, values: dict) -> Path:
     doc.save(out_docx)
     return out_docx
 
+
+# I can overengineer this with regex, or just pass in a json with empty values
+# Assumes file is in CVs_generated
+def removeUnfilledFields(docName: str):
+    docName = OUTPUT_FOLDER / docName
+    doc = Document(docName)
+
+    with open("../empty_values.json", "r") as f:
+        f = json.load(f)
+        _replace_in_doc(doc, f)
+
+    doc.save(docName)
+
+
 def convertDocToPdf(docPath, pdfPath):
     convert(docPath, pdfPath)
+
 
 if __name__ == "__main__":
     with open("../example_values.json", "r", encoding="utf-8") as f:
         values = json.load(f)
-    out = fill_cv("cv_gen_template_test.docx", values)
-    print(out)
-    pdf = convertDocToPdf(out,"/CVs_generated/a.pdf")
-    print(pdf)
+    template = "cv_gen_template_test.docx"
+    out = fill_cv(template, values)
+    removeUnfilledFields(out)
+    print(f"saved doc to: {out}")
+    # pdf = convertDocToPdf(out, "/CVs_generated/a.pdf")
+    # print(pdf)

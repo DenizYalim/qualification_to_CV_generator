@@ -73,24 +73,5 @@ def testLLM():
     response = getResponse(body.get("prompt", "hey gpt how are you doing?"))
     return jsonify({"response": response})
 
-
-"""
-# API Routes
-@app.route('/api/products/<int:seller_id>')
-def get_products(seller_id):
-    
-    return jsonify([{"id": p.id, "name": p.name} for p in products])
-
-@app.route('/api/comments/<int:product_id>')
-def get_comments(product_id):
-    comments = Comment.query.filter_by(product_id=product_id).all()
-    return jsonify([{
-        "platform": c.platform,
-        "user": c.user,
-        "text": c.text,
-        "rating": c.rating
-    } for c in comments])
-"""
-
 if __name__ == "__main__":
     app.run(debug=True)

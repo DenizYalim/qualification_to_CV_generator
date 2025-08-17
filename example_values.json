@@ -2,7 +2,10 @@
     "name": "deniz",
     "surname": "yilmaz",
     "header_descriptor": "highly motivated java expert etc etc.",
-    "gpa": "",
+    "gpa": "3.0",
+    "email": "",
+    "address": "",
+    "phoneNumber": "",
     "essentials": [
         "got 9 in ielts",
         "done double majors, in both CS and SE"

@@ -2,6 +2,7 @@ import sqlite3
 from datetime import datetime
 
 
+# Returns connection obj and cursor obj
 def pre_req():
     conn = sqlite3.connect("qualifications.db")
     cursor = conn.cursor()
@@ -21,11 +22,8 @@ def pre_req():
     return conn, cursor
 
 
-def add_qualification_to_db(qualifications, essentiality=False, conn=None, cursor=None):
-    should_close = False
-    if conn is None or cursor is None:
-        conn, cursor = pre_req()
-        should_close = True
+def add_qualification_to_db(qualifications, essentiality=False): 
+    conn, cursor = pre_req()
 
     if not isinstance(qualifications, list):
         qualifications = [qualifications]
@@ -39,13 +37,11 @@ def add_qualification_to_db(qualifications, essentiality=False, conn=None, curso
             (qualification, essentiality, datetime.now().strftime("%Y-%m-%d")),
         )
 
-    if should_close:
-        conn.commit()
-        conn.close()
+    conn.commit()
+    conn.close()
 
 
-# TODO: Maybe instead of passing down conn and cursor like this (horrible) I can just drop the table below, commit and close connection then call the addToDB again where it request connection again and sets up the table again
-def set_qualification_table(new_list):
+def delete_rows():
     conn, cursor = pre_req()
 
     cursor.execute(  # Deletes every row
@@ -54,15 +50,20 @@ def set_qualification_table(new_list):
         """
     )
 
-    add_qualification_to_db(
-        new_list, cursor=cursor, conn=conn
-    )  # This is nice and all but this makes it impossible to add essential qualities.
-
     conn.commit()
     conn.close()
 
 
-def get_qualifications(include_date_info=True, justQualifications = False):
+# TODO: Maybe instead of passing down conn and cursor like this (horrible) I can just drop the table below, commit and close connection then call the addToDB again where it request connection again and sets up the table again
+def set_qualification_table(new_list):
+
+    delete_rows()
+
+    # This is nice and all but this makes it impossible to add essential qualities.
+    add_qualification_to_db(new_list)
+
+
+def get_qualifications(include_date_info=True, justQualifications=False):
     conn, cursor = pre_req()
 
     statement = "SELECT text, essential FROM qualifications"
@@ -70,7 +71,6 @@ def get_qualifications(include_date_info=True, justQualifications = False):
         statement = "SELECT text, essential, dateAdded FROM qualifications"
     if justQualifications:
         statement = "SELECT text FROM qualifications"
-
 
     cursor.execute(
         statement,
@@ -84,3 +84,8 @@ def get_qualifications(include_date_info=True, justQualifications = False):
     ]  # Turns the weird [(headline,),(headline,)] to [headline]
 
     return qualifications
+
+
+if __name__ == "__main__":
+    print("a")
+    pre_req()
