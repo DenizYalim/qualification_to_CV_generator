@@ -2,20 +2,21 @@ from docx import Document
 from docx2pdf import convert
 from pathlib import Path
 import json
+import re
 
 TEMPLATES_FOLDER = Path("../CV_templates")
 OUTPUT_FOLDER = Path("../CVs_generated")
 OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
 
 
-def _replace_one_placeholder_in_paragraph(p, key: str, val: str) -> bool:
+def _replace_one_placeholder_in_paragraph(p, key: str, val: str) -> bool: 
     ph = f"{{{{{key}}}}}"
     if ph not in p.text:
         return False
-    txt = p.text
+    txt = p.text 
     # replace only the first occurrence for list items
     new_txt = txt.replace(ph, val, 1)
-    if new_txt != txt:
+    if new_txt != txt: 
         p.text = new_txt  # note: resets runs formatting in this paragraph
         return True
     return False
@@ -23,7 +24,7 @@ def _replace_one_placeholder_in_paragraph(p, key: str, val: str) -> bool:
 
 def _place_value(doc: Document, key: str, val: str) -> bool:
     # paragraphs
-    for p in doc.paragraphs:
+    for p in doc.paragraphs: 
         if _replace_one_placeholder_in_paragraph(p, key, val):
             return True
     # tables
@@ -79,13 +80,31 @@ def removeUnfilledFields(docName: str):
 def convertDocToPdf(docPath, pdfPath):
     convert(docPath, pdfPath)
 
+# Absolute path 
+def getAllFieldsInADoc(docPath : str):
+    print(docPath)
+    doc = Document(docPath)
+    pattern = r"\{\{\s*(.*?)\s*\}\}"
+    fields = [] # remove duplicates laters
+    for p in doc.paragraphs:
+        print("za"+p.text)
+        for field in re.findall(pattern, p.text): 
+            if field not in fields:
+               fields.append(field)
+               print(f"added field: {field}")
+    
+    return fields
 
 if __name__ == "__main__":
     with open("../example_values.json", "r", encoding="utf-8") as f:
         values = json.load(f)
     template = "cv_gen_template_test.docx"
     out = fill_cv(template, values)
-    removeUnfilledFields(out)
-    print(f"saved doc to: {out}")
+    print()
+    template_path = TEMPLATES_FOLDER / template
+    print(getAllFieldsInADoc(template_path)) 
+
+    # removeUnfilledFields(out)
+    # print(f"saved doc to: {out}")
     # pdf = convertDocToPdf(out, "/CVs_generated/a.pdf")
     # print(pdf)

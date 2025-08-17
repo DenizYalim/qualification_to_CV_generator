@@ -21,9 +21,8 @@ def addQualifications():
     body = request.get_json()
     qualification = body["qualifications"]
 
-    essentiality = body.get("essential", False)
 
-    add_qualification_to_db(qualification, essentiality)
+    add_qualification_to_db(qualification)
 
     # is it better to use responseBodies rather than jsonify ? # probs doesn't matter one bit
     return Response("Qualification added", status=200)
