@@ -10,6 +10,9 @@ CORS(app)
 # endpoints: ./getQualifications ./setQualificationListToList ./createCV ./getLastCreatedCV
 
 
+
+
+
 @app.route("/getQualifications")
 def getQualifications():
     qualifications = get_qualifications(justQualifications=True)
