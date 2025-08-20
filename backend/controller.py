@@ -10,9 +10,6 @@ CORS(app)
 # endpoints: ./getQualifications ./setQualificationListToList ./createCV ./getLastCreatedCV
 
 
-
-
-
 @app.route("/getQualifications")
 def getQualifications():
     qualifications = get_qualifications(justQualifications=True)
@@ -49,7 +46,7 @@ def askForSuggestions():
 
 
 # Should get qualities chosen and template chosen from body
-@app.route("/createCVDoc")
+@app.route("/createCVDoc", methods=["POST"])
 def createCVDoc():
     body = request.get_json()
     values = body["values"]
@@ -59,7 +56,7 @@ def createCVDoc():
 
 
 # Should get qualities chosen and template chosen from body
-@app.route("/createCV")
+@app.route("/createCV", methods=["POST"])
 def createCV():
     body = request.get_json()
     values = body["values"]

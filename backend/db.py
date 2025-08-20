@@ -40,13 +40,11 @@ def add_qualification_to_db(qualifications):
     conn.close()
 
 
-def delete_rows():
+def truncate_table(table:str):
     conn, cursor = pre_req()
 
     cursor.execute(  # Deletes every row
-        """
-        DELETE FROM qualifications
-        """
+        f"TRUNCATE TABLE {table}"
     )
 
     conn.commit()
@@ -55,9 +53,7 @@ def delete_rows():
 
 # TODO: Maybe instead of passing down conn and cursor like this (horrible) I can just drop the table below, commit and close connection then call the addToDB again where it request connection again and sets up the table again
 def set_qualification_table(new_list):
-
-    delete_rows()
-    
+    truncate_table("qualifications")
     add_qualification_to_db(new_list)
 
 
