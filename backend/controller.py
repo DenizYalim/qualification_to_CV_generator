@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
-from db import add_qualification_to_db, get_qualifications, set_qualification_table
+from db import add_qualification_to_db, getTable, set_qualification_table
 from llmCVGenerate import askForMatchingQualifications, getResponse
 from cvMaker import fill_cv, convertDocToPdf
 
@@ -12,7 +12,7 @@ CORS(app)
 
 @app.route("/getQualifications")
 def getQualifications():
-    qualifications = get_qualifications(justQualifications=True)
+    qualifications = getTable(justQualifications=True)
     return jsonify(qualifications)
 
 
@@ -40,7 +40,7 @@ def setQualificationListToList():
 def askForSuggestions():
     body = request.get_json()
     response = askForMatchingQualifications(
-        get_qualifications(include_date_info=False), body["jobDetails"]
+        getTable(include_date_info=False), body["jobDetails"]
     )
     return jsonify({"response": response})
 
