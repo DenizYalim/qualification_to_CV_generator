@@ -4,6 +4,7 @@ from typing import Iterable, List, Tuple
 
 DB_PATH = Path("infoTable.db")
 
+
 def _connect() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -11,15 +12,20 @@ def _connect() -> sqlite3.Connection:
     conn.execute("PRAGMA synchronous=NORMAL")
     return conn
 
+
 def init_db() -> None:
     with _connect() as conn:
-        conn.execute("""
+        conn.execute(
+            """
             CREATE TABLE IF NOT EXISTS infoTable (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                text TEXT NOT NULL UNIQUE,
+                key TEXT NOT NULL UNIQUE,
+                value TEXT,
                 dateAdded TEXT NOT NULL DEFAULT (datetime('now'))
             )
-        """)
+        """
+        )
+
 
 def insert_rows(quals: str | Iterable[str]) -> int:
     if isinstance(quals, str):
@@ -34,6 +40,7 @@ def insert_rows(quals: str | Iterable[str]) -> int:
         )
         return cur.rowcount  # SQLite 3.24+ gives >=0; may be -1 on some builds
 
+
 def replace_all(quals: Iterable[str]) -> int:
     rows = [(q.strip(),) for q in quals if str(q).strip()]
     with _connect() as conn:
@@ -44,16 +51,22 @@ def replace_all(quals: Iterable[str]) -> int:
         cur = conn.executemany("INSERT INTO infoTable(text) VALUES (?)", rows)
         return cur.rowcount
 
+
 def get_table(just_text: bool = False) -> List[str] | List[Tuple[str, str]]:
     with _connect() as conn:
         if just_text:
-            return [r["text"] for r in conn.execute(
-                "SELECT text FROM infoTable ORDER BY id"
-            )]
+            return [
+                r["text"]
+                for r in conn.execute("SELECT text FROM infoTable ORDER BY id")
+            ]
         else:
-            return [(r["text"], r["dateAdded"]) for r in conn.execute(
-                "SELECT text, dateAdded FROM infoTable ORDER BY id"
-            )]
+            return [
+                (r["text"], r["dateAdded"])
+                for r in conn.execute(
+                    "SELECT text, dateAdded FROM infoTable ORDER BY id"
+                )
+            ]
+
 
 if __name__ == "__main__":
     init_db()
